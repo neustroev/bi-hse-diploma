@@ -1,0 +1,497 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="BookStoreModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityContainer Name="BookStoreModelStoreContainer">
+          <EntitySet Name="Category" EntityType="BookStoreModel.Store.Category" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Chapter" EntityType="BookStoreModel.Store.Chapter" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Genre" EntityType="BookStoreModel.Store.Genre" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Publication" EntityType="BookStoreModel.Store.Publication" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="PublicationGenre" EntityType="BookStoreModel.Store.PublicationGenre" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Transaction" EntityType="BookStoreModel.Store.Transaction" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="User" EntityType="BookStoreModel.Store.User" store:Type="Tables" Schema="dbo" />
+          <AssociationSet Name="FK_ChapterPublication" Association="BookStoreModel.Store.FK_ChapterPublication">
+            <End Role="Publication" EntitySet="Publication" />
+            <End Role="Chapter" EntitySet="Chapter" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GenreGenre" Association="BookStoreModel.Store.FK_GenreGenre">
+            <End Role="Genre" EntitySet="Genre" />
+            <End Role="Genre1" EntitySet="Genre" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PublicationCategory" Association="BookStoreModel.Store.FK_PublicationCategory">
+            <End Role="Category" EntitySet="Category" />
+            <End Role="Publication" EntitySet="Publication" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PublicationGenre_Genre" Association="BookStoreModel.Store.FK_PublicationGenre_Genre">
+            <End Role="Genre" EntitySet="Genre" />
+            <End Role="PublicationGenre" EntitySet="PublicationGenre" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PublicationGenre_Publication" Association="BookStoreModel.Store.FK_PublicationGenre_Publication">
+            <End Role="Publication" EntitySet="Publication" />
+            <End Role="PublicationGenre" EntitySet="PublicationGenre" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TransactionChapter" Association="BookStoreModel.Store.FK_TransactionChapter">
+            <End Role="Chapter" EntitySet="Chapter" />
+            <End Role="Transaction" EntitySet="Transaction" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserPublication" Association="BookStoreModel.Store.FK_UserPublication">
+            <End Role="User" EntitySet="User" />
+            <End Role="Publication" EntitySet="Publication" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserTransaction" Association="BookStoreModel.Store.FK_UserTransaction">
+            <End Role="User" EntitySet="User" />
+            <End Role="Transaction" EntitySet="Transaction" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Category">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Chapter">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Content" Type="varbinary(max)" Nullable="false" />
+          <Property Name="Price" Type="float" Nullable="false" />
+          <Property Name="Publication_Id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Genre">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="ParentGenre_Id" Type="int" />
+        </EntityType>
+        <EntityType Name="Publication">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Date" Type="datetime" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="Category_Id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PublicationGenre">
+          <Key>
+            <PropertyRef Name="Publication_Id" />
+            <PropertyRef Name="Genre_Id" />
+          </Key>
+          <Property Name="Publication_Id" Type="int" Nullable="false" />
+          <Property Name="Genre_Id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Transaction">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="Interest" Type="float" Nullable="false" />
+          <Property Name="Date" Type="datetime" Nullable="false" />
+          <Property Name="Chapter_Id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Password" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Login" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Email" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Birthdate" Type="datetime" Nullable="false" />
+          <Property Name="Balance" Type="float" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_ChapterPublication">
+          <End Role="Publication" Type="BookStoreModel.Store.Publication" Multiplicity="1" />
+          <End Role="Chapter" Type="BookStoreModel.Store.Chapter" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Publication">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Chapter">
+              <PropertyRef Name="Publication_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GenreGenre">
+          <End Role="Genre" Type="BookStoreModel.Store.Genre" Multiplicity="0..1" />
+          <End Role="Genre1" Type="BookStoreModel.Store.Genre" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Genre">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Genre1">
+              <PropertyRef Name="ParentGenre_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PublicationCategory">
+          <End Role="Category" Type="BookStoreModel.Store.Category" Multiplicity="1" />
+          <End Role="Publication" Type="BookStoreModel.Store.Publication" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Publication">
+              <PropertyRef Name="Category_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PublicationGenre_Genre">
+          <End Role="Genre" Type="BookStoreModel.Store.Genre" Multiplicity="1" />
+          <End Role="PublicationGenre" Type="BookStoreModel.Store.PublicationGenre" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Genre">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PublicationGenre">
+              <PropertyRef Name="Genre_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PublicationGenre_Publication">
+          <End Role="Publication" Type="BookStoreModel.Store.Publication" Multiplicity="1" />
+          <End Role="PublicationGenre" Type="BookStoreModel.Store.PublicationGenre" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Publication">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PublicationGenre">
+              <PropertyRef Name="Publication_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TransactionChapter">
+          <End Role="Chapter" Type="BookStoreModel.Store.Chapter" Multiplicity="1" />
+          <End Role="Transaction" Type="BookStoreModel.Store.Transaction" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Chapter">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Transaction">
+              <PropertyRef Name="Chapter_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserPublication">
+          <End Role="User" Type="BookStoreModel.Store.User" Multiplicity="1" />
+          <End Role="Publication" Type="BookStoreModel.Store.Publication" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Publication">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserTransaction">
+          <End Role="User" Type="BookStoreModel.Store.User" Multiplicity="1" />
+          <End Role="Transaction" Type="BookStoreModel.Store.Transaction" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Transaction">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="BookStoreModel" Alias="Self" p1:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:p1="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="BookStoreEntities" p1:LazyLoadingEnabled="true">
+          <EntitySet Name="Category" EntityType="BookStoreModel.Category" />
+          <EntitySet Name="Chapter" EntityType="BookStoreModel.Chapter" />
+          <EntitySet Name="Genre" EntityType="BookStoreModel.Genre" />
+          <EntitySet Name="Publication" EntityType="BookStoreModel.Publication" />
+          <EntitySet Name="Transaction" EntityType="BookStoreModel.Transaction" />
+          <EntitySet Name="User" EntityType="BookStoreModel.User" />
+          <AssociationSet Name="FK_PublicationCategory" Association="BookStoreModel.FK_PublicationCategory">
+            <End Role="Category" EntitySet="Category" />
+            <End Role="Publication" EntitySet="Publication" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ChapterPublication" Association="BookStoreModel.FK_ChapterPublication">
+            <End Role="Publication" EntitySet="Publication" />
+            <End Role="Chapter" EntitySet="Chapter" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TransactionChapter" Association="BookStoreModel.FK_TransactionChapter">
+            <End Role="Chapter" EntitySet="Chapter" />
+            <End Role="Transaction" EntitySet="Transaction" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GenreGenre" Association="BookStoreModel.FK_GenreGenre">
+            <End Role="Genre" EntitySet="Genre" />
+            <End Role="Genre1" EntitySet="Genre" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserPublication" Association="BookStoreModel.FK_UserPublication">
+            <End Role="User" EntitySet="User" />
+            <End Role="Publication" EntitySet="Publication" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserTransaction" Association="BookStoreModel.FK_UserTransaction">
+            <End Role="User" EntitySet="User" />
+            <End Role="Transaction" EntitySet="Transaction" />
+          </AssociationSet>
+          <AssociationSet Name="PublicationGenre" Association="BookStoreModel.PublicationGenre">
+            <End Role="Genre" EntitySet="Genre" />
+            <End Role="Publication" EntitySet="Publication" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Category">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="Publication" Relationship="BookStoreModel.FK_PublicationCategory" FromRole="Category" ToRole="Publication" />
+        </EntityType>
+        <EntityType Name="Chapter">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="Content" Type="Binary" Nullable="false" MaxLength="Max" FixedLength="false" />
+          <Property Name="Price" Type="Double" Nullable="false" />
+          <Property Name="Publication_Id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Publication" Relationship="BookStoreModel.FK_ChapterPublication" FromRole="Chapter" ToRole="Publication" />
+          <NavigationProperty Name="Transaction" Relationship="BookStoreModel.FK_TransactionChapter" FromRole="Chapter" ToRole="Transaction" />
+        </EntityType>
+        <EntityType Name="Genre">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="ParentGenre_Id" Type="Int32" />
+          <NavigationProperty Name="Genre1" Relationship="BookStoreModel.FK_GenreGenre" FromRole="Genre" ToRole="Genre1" />
+          <NavigationProperty Name="Genre2" Relationship="BookStoreModel.FK_GenreGenre" FromRole="Genre1" ToRole="Genre" />
+          <NavigationProperty Name="Publication" Relationship="BookStoreModel.PublicationGenre" FromRole="Genre" ToRole="Publication" />
+        </EntityType>
+        <EntityType Name="Publication">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="Category_Id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Category" Relationship="BookStoreModel.FK_PublicationCategory" FromRole="Publication" ToRole="Category" />
+          <NavigationProperty Name="Chapter" Relationship="BookStoreModel.FK_ChapterPublication" FromRole="Publication" ToRole="Chapter" />
+          <NavigationProperty Name="User" Relationship="BookStoreModel.FK_UserPublication" FromRole="Publication" ToRole="User" />
+          <NavigationProperty Name="Genre" Relationship="BookStoreModel.PublicationGenre" FromRole="Publication" ToRole="Genre" />
+        </EntityType>
+        <EntityType Name="Transaction">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="Interest" Type="Double" Nullable="false" />
+          <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Chapter_Id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Chapter" Relationship="BookStoreModel.FK_TransactionChapter" FromRole="Transaction" ToRole="Chapter" />
+          <NavigationProperty Name="User" Relationship="BookStoreModel.FK_UserTransaction" FromRole="Transaction" ToRole="User" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="Password" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="Login" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="Email" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="Birthdate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Balance" Type="Double" Nullable="false" />
+          <NavigationProperty Name="Publication" Relationship="BookStoreModel.FK_UserPublication" FromRole="User" ToRole="Publication" />
+          <NavigationProperty Name="Transaction" Relationship="BookStoreModel.FK_UserTransaction" FromRole="User" ToRole="Transaction" />
+        </EntityType>
+        <Association Name="FK_PublicationCategory">
+          <End Role="Category" Type="BookStoreModel.Category" Multiplicity="1" />
+          <End Role="Publication" Type="BookStoreModel.Publication" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Publication">
+              <PropertyRef Name="Category_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ChapterPublication">
+          <End Role="Publication" Type="BookStoreModel.Publication" Multiplicity="1" />
+          <End Role="Chapter" Type="BookStoreModel.Chapter" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Publication">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Chapter">
+              <PropertyRef Name="Publication_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TransactionChapter">
+          <End Role="Chapter" Type="BookStoreModel.Chapter" Multiplicity="1" />
+          <End Role="Transaction" Type="BookStoreModel.Transaction" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Chapter">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Transaction">
+              <PropertyRef Name="Chapter_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GenreGenre">
+          <End Role="Genre" Type="BookStoreModel.Genre" Multiplicity="0..1" />
+          <End Role="Genre1" Type="BookStoreModel.Genre" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Genre">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Genre1">
+              <PropertyRef Name="ParentGenre_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserPublication">
+          <End Role="User" Type="BookStoreModel.User" Multiplicity="1" />
+          <End Role="Publication" Type="BookStoreModel.Publication" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Publication">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserTransaction">
+          <End Role="User" Type="BookStoreModel.User" Multiplicity="1" />
+          <End Role="Transaction" Type="BookStoreModel.Transaction" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Transaction">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="PublicationGenre">
+          <End Role="Genre" Type="BookStoreModel.Genre" Multiplicity="*" />
+          <End Role="Publication" Type="BookStoreModel.Publication" Multiplicity="*" />
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="BookStoreModelStoreContainer" CdmEntityContainer="BookStoreEntities">
+          <EntitySetMapping Name="Category">
+            <EntityTypeMapping TypeName="BookStoreModel.Category">
+              <MappingFragment StoreEntitySet="Category">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Chapter">
+            <EntityTypeMapping TypeName="BookStoreModel.Chapter">
+              <MappingFragment StoreEntitySet="Chapter">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="Price" ColumnName="Price" />
+                <ScalarProperty Name="Publication_Id" ColumnName="Publication_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Genre">
+            <EntityTypeMapping TypeName="BookStoreModel.Genre">
+              <MappingFragment StoreEntitySet="Genre">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ParentGenre_Id" ColumnName="ParentGenre_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Publication">
+            <EntityTypeMapping TypeName="BookStoreModel.Publication">
+              <MappingFragment StoreEntitySet="Publication">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Category_Id" ColumnName="Category_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Transaction">
+            <EntityTypeMapping TypeName="BookStoreModel.Transaction">
+              <MappingFragment StoreEntitySet="Transaction">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Interest" ColumnName="Interest" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="Chapter_Id" ColumnName="Chapter_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="User">
+            <EntityTypeMapping TypeName="BookStoreModel.User">
+              <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="Login" ColumnName="Login" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Birthdate" ColumnName="Birthdate" />
+                <ScalarProperty Name="Balance" ColumnName="Balance" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="PublicationGenre" TypeName="BookStoreModel.PublicationGenre" StoreEntitySet="PublicationGenre">
+            <EndProperty Name="Genre">
+              <ScalarProperty Name="Id" ColumnName="Genre_Id" />
+            </EndProperty>
+            <EndProperty Name="Publication">
+              <ScalarProperty Name="Id" ColumnName="Publication_Id" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
