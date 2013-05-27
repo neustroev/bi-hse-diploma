@@ -1,0 +1,94 @@
+﻿@{
+    ViewBag.Title = "Главная страница";
+}
+<div class="container-fluid" style="padding-top: 10px;">
+    <div class="row-fluid">
+        <div class="span3">
+            <div id="navPanel" class="well sidebar-nav">
+                <ul class="nav nav-list">
+                    <li class="active"><a href="#main">Основные показатели</a></li>
+                    <li class=""><a href="#counts">Количественные показатели</a></li>
+                    <li class=""><a href="#aggr">Агрегированные показатели</a></li>
+                    <li class=""><a href="#trans">Показатели транзакций</a></li>
+                    <li class=""><a href="#rating">Рейтинги</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="span9">
+            <div id="main" class="viewContainer active">
+                <div class="controlView">
+                    <div class="btn-group" data-toggle="buttons-radio">
+                        <button type="button" data-target=".tableView" class="btn btn-primary tableViewControl">Таблица</button>
+                        <button type="button" data-target=".chartView" class="btn btn-primary chartViewControl active">График</button>
+                    </div>
+                </div>
+                <div class="contentView">
+                    <div class="chartView active"></div>
+                    <div class="tableView">Здесь будет таблица с данными</div>
+                </div>
+            </div>
+            <div id="counts" class="viewContainer">
+                <div class="controlView">
+                    <div class="btn-group" data-toggle="buttons-radio">
+                        <button type="button" data-target=".tableView" class="btn btn-primary tableViewControl">Таблица</button>
+                        <button type="button" data-target=".chartView" class="btn btn-primary chartViewControl active">График</button>
+                    </div>
+                </div>
+                <div class="contentView">
+                    <div class="chartView active"></div>
+                    <div class="tableView">Здесь будет таблица с данными</div>
+                </div>
+            </div>
+            <div id="aggr" class="viewContainer">
+                <div class="controlView">
+                    <div class="btn-group" data-toggle="buttons-radio">
+                        <button type="button" data-target=".tableView" class="btn btn-primary tableViewControl">Таблица</button>
+                        <button type="button" data-target=".chartView" class="btn btn-primary chartViewControl active">График</button>
+                    </div>
+                </div>
+                <div class="contentView">
+                    <div class="chartView active"></div>
+                    <div class="tableView">Здесь будет таблица с данными</div>
+                </div>
+            </div>
+            <div id="trans" class="viewContainer">
+                <div class="controlView">
+                    <div class="btn-group" data-toggle="buttons-radio">
+                        <button type="button" data-target=".tableView" class="btn btn-primary tableViewControl">Таблица</button>
+                        <button type="button" data-target=".chartView" class="btn btn-primary chartViewControl active">График</button>
+                    </div>
+                </div>
+                <div class="contentView">
+                    <div class="chartView active"></div>
+                    <div class="tableView">Здесь будет таблица с данными</div>
+                </div>
+            </div>
+            <div id="rating" class="viewContainer">
+                <div class="controlView">
+                    <div class="btn-group" data-toggle="buttons-radio">
+                        <button type="button" data-target=".tableView" class="btn btn-primary tableViewControl">Таблица</button>
+                        <button type="button" data-target=".chartView" class="btn btn-primary chartViewControl active">График</button>
+                    </div>
+                </div>
+                <div class="contentView">
+                    <div class="chartView active"></div>
+                    <div class="tableView">Здесь будет таблица с данными</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- TO DO: move scripts into bundle -->
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
+@Scripts.Render("~/bundles/scripts/datamart")
+
+<script>
+    $(function () {
+        var dmPage = new DataMart({
+            navigationPanel: $('#navPanel'),
+            viewContainers: $('.viewContainer'),
+            viewControls: $('.tableViewControl, .chartViewControl')
+        });
+    });
+</script>
