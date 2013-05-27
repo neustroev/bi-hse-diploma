@@ -164,8 +164,18 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Code\ApiErrors\ErrorEnum.cs" />
+    <Compile Include="Code\ApiErrors\TokenState.cs" />
+    <Compile Include="Code\Attribute\TokenAuthAttribute.cs" />
+    <Compile Include="Code\CorsHandler.cs" />
+    <Compile Include="Code\Extensions\HttpRequestMessageExtensions.cs" />
+    <Compile Include="Code\Models\UserProfile.cs" />
+    <Compile Include="Code\Utilities\TokenHelper.cs" />
+    <Compile Include="Controllers\AuthController.cs" />
+    <Compile Include="Controllers\CategoriesController.cs" />
+    <Compile Include="Controllers\GenresController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -290,6 +300,8 @@
       <DependentUpon>BookStore.edmx</DependentUpon>
       <LastGenOutput>BookStore.cs</LastGenOutput>
     </Content>
+    <None Include="Properties\PublishProfiles\book-store - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\book-store - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.8.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.8.2.js" />
     <Content Include="Scripts\jquery-1.8.2.min.js" />

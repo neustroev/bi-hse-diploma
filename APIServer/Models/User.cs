@@ -27,6 +27,7 @@ namespace APIServer.Models
         public string Email { get; set; }
         public System.DateTime Birthdate { get; set; }
         public double Balance { get; set; }
+        public string Salt { get; set; }
     
         public virtual ICollection<Publication> Publication { get; set; }
         public virtual ICollection<Transaction> Transaction { get; set; }

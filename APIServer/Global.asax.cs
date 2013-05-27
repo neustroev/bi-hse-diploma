@@ -1,4 +1,5 @@
-﻿using System;
+﻿using APIServer.Code;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -24,6 +25,7 @@ namespace APIServer
 			BundleConfig.RegisterBundles(BundleTable.Bundles);
 
 			GlobalConfiguration.Configuration.Formatters.XmlFormatter.SupportedMediaTypes.Clear();
+			GlobalConfiguration.Configuration.MessageHandlers.Add(new CorsHandler());
 		}
 	}
 }

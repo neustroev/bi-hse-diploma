@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="BookStoreModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="BookStoreModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityContainer Name="BookStoreModelStoreContainer">
           <EntitySet Name="Category" EntityType="BookStoreModel.Store.Category" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="Chapter" EntityType="BookStoreModel.Store.Chapter" store:Type="Tables" Schema="dbo" />
@@ -105,11 +105,12 @@
           </Key>
           <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
           <Property Name="Password" Type="nvarchar(max)" Nullable="false" />
-          <Property Name="Login" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Login" Type="nvarchar(max)" />
           <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
           <Property Name="Email" Type="nvarchar(max)" Nullable="false" />
           <Property Name="Birthdate" Type="datetime" Nullable="false" />
           <Property Name="Balance" Type="float" Nullable="false" />
+          <Property Name="Salt" Type="nvarchar(max)" />
         </EntityType>
         <Association Name="FK_ChapterPublication">
           <End Role="Publication" Type="BookStoreModel.Store.Publication" Multiplicity="1" />
@@ -207,8 +208,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="BookStoreModel" Alias="Self" p1:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:p1="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -311,13 +311,14 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
           <Property Name="Password" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
-          <Property Name="Login" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="Login" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
           <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
           <Property Name="Email" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
           <Property Name="Birthdate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="Balance" Type="Double" Nullable="false" />
           <NavigationProperty Name="Publication" Relationship="BookStoreModel.FK_UserPublication" FromRole="User" ToRole="Publication" />
           <NavigationProperty Name="Transaction" Relationship="BookStoreModel.FK_UserTransaction" FromRole="User" ToRole="Transaction" />
+          <Property Type="String" Name="Salt" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
         <Association Name="FK_PublicationCategory">
           <End Role="Category" Type="BookStoreModel.Category" Multiplicity="1" />
@@ -454,6 +455,7 @@
           <EntitySetMapping Name="User">
             <EntityTypeMapping TypeName="BookStoreModel.User">
               <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="Salt" ColumnName="Salt" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Password" ColumnName="Password" />
                 <ScalarProperty Name="Login" ColumnName="Login" />
