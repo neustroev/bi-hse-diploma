@@ -5,13 +5,14 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Web.Code.Mongo;
+using Web.Code.DataExportProvider;
 
 namespace Web.Controllers
 {
     public class DataMartController : Controller
     {
         public ActionResult Index()
-        {            
+        {
             return View();
             //return RedirectToAction("Login", "DataMart");
         }
@@ -33,5 +34,10 @@ namespace Web.Controllers
         //{
         //    return Database.Instance.IsUser(id);
         //}
+
+        public void SuperAction()
+        {
+            DataExportProvider.Instance.Export();
+        }
     }
 }

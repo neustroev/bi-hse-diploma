@@ -25,6 +25,16 @@ namespace Web.Code.Mongo
             get { return DatabaseCreator.Instance; }
         }
 
+        public sealed class CollectionNames
+        {
+
+            private CollectionNames() { }
+
+            public static readonly string Aggregations = "EntityAggregation";
+            public static readonly string Counts = "EntityCount";
+            public static readonly string Transactions = "TransactionStats";
+        }
+
         private MongoServer _server;
         private MongoServer Server
         {
@@ -63,6 +73,21 @@ namespace Web.Code.Mongo
             return user != null;
         }
 
+        public void InsertCollection<T>(List<T> list, string collectionName)
+        {
+            var collection = Db.GetCollection<T>(collectionName);
+            EraseCollection(collection);
+            collection.InsertBatch(list);
+        }
 
+        public List<T> GetCollection<T>(string collectionName)
+        {
+            return Db.GetCollection<T>(collectionName).FindAll().ToList();
+        }
+
+        private void EraseCollection(MongoCollection collection)
+        {
+            collection.RemoveAll();
+        }
     }
 }

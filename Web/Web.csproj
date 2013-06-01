@@ -134,11 +134,13 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Code\Mongo\Aggregators\IAggregator.cs" />
+    <Compile Include="Code\Mongo\Aggregators\Aggregator.cs" />
     <Compile Include="Code\Mongo\Database.cs" />
+    <Compile Include="Code\Mongo\Entities\EntityAggregation.cs" />
     <Compile Include="Code\Mongo\Entities\EntityCount.cs" />
     <Compile Include="Code\Mongo\Entities\TransactionStats.cs" />
     <Compile Include="Code\Mongo\Entities\User.cs" />
+    <Compile Include="Code\Worker\DataExportProvider.cs" />
     <Compile Include="Controllers\DataMartController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -248,6 +250,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\APIServer\APIServer.csproj">
+      <Project>{fdf37b54-9da7-4e34-8bf6-81ba714ac1b4}</Project>
+      <Name>APIServer</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
