@@ -43,18 +43,18 @@ namespace Web.Code.DataExportProvider
             var booksByGenre = (from p in DBModel.Genre
                                 select new EntityCount()
                                 {
-                                    Name = "Количество книг по жанру " + p.Name,
+                                    Name = p.Name,
                                     Count = p.Publication.Count,
-                                    Search = p.Name
-                                });
+                                    Search = "genre"
+                                }).OrderByDescending(x => x.Count);
 
             var booksByCategory = (from c in DBModel.Category
                                    select new EntityCount()
                                    {
-                                       Name = "Количество книг по категории " + c.Name,
+                                       Name = c.Name,
                                        Count = c.Publication.Count,
-                                       Search = c.Name
-                                   });
+                                       Search = "category"
+                                   }).OrderByDescending(x => x.Count);
 
             List<EntityCount> batch = new List<EntityCount>() {
                 new EntityCount()
@@ -78,21 +78,21 @@ namespace Web.Code.DataExportProvider
                 {
                     Name = "Количество пользователей",
                     Count = DBModel.User.Count(),
-                    Search = "Amount"
+                    Search = "amount"
                 },
 
                 new EntityCount()
                 {
                     Name = "Количество публикаций",
                     Count = DBModel.Publication.Count(),
-                    Search = "Amount"
+                    Search = "amount"
                 },
 
                 new EntityCount()
                 {
                     Name = "Количество транзакций",
                     Count = DBModel.Transaction.Count(),
-                    Search = "Amount"
+                    Search = "amount"
                 },
             };
 
@@ -107,14 +107,16 @@ namespace Web.Code.DataExportProvider
         {
             List<EntityAggregation> batch = new List<EntityAggregation>();
             var booksByUser = (from u in DBModel.User
+                               let _pubCount = u.Publication.Count
+                               where _pubCount > 0
                                select new EntityAggregation()
                                {
                                    Aggregation = new Aggregator()
                                    {
-                                       Name = "Сумма",
-                                       Value = u.Publication.Count
+                                       Name = "sum",
+                                       Value = _pubCount
                                    },
-                                   Indicator = "Количество книг у автора",
+                                   Indicator = "all",
                                    Entity = u.Name
                                });
 
@@ -122,40 +124,48 @@ namespace Web.Code.DataExportProvider
                                     select t.Chapter.Publication_Id);
 
             var soldBooksByUser = (from u in DBModel.User
+                                   where u.Publication.Count > 0
                                    select new EntityAggregation()
                                    {
                                        Aggregation = new Aggregator()
                                        {
-                                           Name = "Сумма",
+                                           Name = "sum",
                                            Value = (from p in u.Publication
                                                     where soldPublications.Contains(p.Id)
                                                     select p).Count()
                                        },
-                                       Indicator = "Количество проданных книг у автора",
+                                       Indicator = "sold",
                                        Entity = u.Name
                                    });
 
+
             var averageBookPriceByUser = (from u in DBModel.User
+                                          where u.Publication.Count > 0
                                           select new EntityAggregation()
                                           {
                                               Aggregation = new Aggregator()
                                               {
-                                                  Name = "Среднее",
-                                                  Value = u.Publication.Average(p => p.Chapter.Sum(el => el.Price))
+                                                  Name = "avg",
+                                                  Value = (from p in u.Publication
+                                                          select p.Chapter.Sum(el => el.Price))
+                                                          .Average()
                                               },
-                                              Indicator = "Средняя стоимость книги у автора",
+                                              Indicator = "price",
                                               Entity = u.Name
                                           });
 
             var maxBookPriceByUser = (from u in DBModel.User
+                                      where u.Publication.Count > 0
                                       select new EntityAggregation()
                                       {
                                           Aggregation = new Aggregator()
                                           {
-                                              Name = "Максимум",
-                                              Value = u.Publication.Max(p => p.Chapter.Sum(c => c.Price))
+                                              Name = "max",
+                                              Value = (from p in u.Publication
+                                                       select p.Chapter.Sum(el => el.Price))
+                                                       .Max()
                                           },
-                                          Indicator = "Максимальная стоимость книги у автора",
+                                          Indicator = "price",
                                           Entity = u.Name
                                       });
 

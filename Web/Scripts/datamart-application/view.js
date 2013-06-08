@@ -1,4 +1,13 @@
-﻿DataMart = function (settings) {
+﻿(function () {
+    DataMartEnum = {};
+    DataMartEnum.Action = {
+        Transactions: "GetTransactions",
+        Amounts: "GetAmounts",
+        Aggregations: "GetAggregations"
+    }
+})();
+
+DataMart = function (settings) {
     this.navigationPanel = settings.navigationPanel;
     this.viewContainers = settings.viewContainers;
     this.viewControls = settings.viewControls;
@@ -20,6 +29,8 @@ dmProto.applyEvents = function () {
         var item = this;
         self._onNavigationPanelItemClick(item);
     });
+    self.navigationPanel.affix();
+
     self.viewContainers.on("show", function (ev) {
         var item = this;
         self._onviewContainershow(item);
@@ -32,64 +43,12 @@ dmProto.applyEvents = function () {
 
 dmProto.showViewContent = function (element) {
     element.addClass("active");
-    //element.find(".chartView").addClass("active");
-    //element.find("button.chartViewControl").addClass("active");
     if (!element.data("dataLoaded")) {
-        //TO DO: ajax calls
-        element.find(".chartView").highcharts({
-            chart: {
-                type: 'line',
-                marginRight: 130,
-                marginBottom: 25
-            },
-            title: {
-                text: 'Monthly Average Temperature',
-                x: -20 //center
-            },
-            subtitle: {
-                text: 'Source: WorldClimate.com',
-                x: -20
-            },
-            xAxis: {
-                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-            },
-            yAxis: {
-                title: {
-                    text: 'Temperature (°C)'
-                },
-                plotLines: [{
-                    value: 0,
-                    width: 1,
-                    color: '#808080'
-                }]
-            },
-            tooltip: {
-                valueSuffix: '°C'
-            },
-            legend: {
-                layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'top',
-                x: -10,
-                y: 100,
-                borderWidth: 0
-            },
-            series: [{
-                name: 'Tokyo',
-                data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
-            }, {
-                name: 'New York',
-                data: [-0.2, 0.8, 5.7, 11.3, 17.0, 22.0, 24.8, 24.1, 20.1, 14.1, 8.6, 2.5]
-            }, {
-                name: 'Berlin',
-                data: [-0.9, 0.6, 3.5, 8.4, 13.5, 17.0, 18.6, 17.9, 14.3, 9.0, 3.9, 1.0]
-            }, {
-                name: 'London',
-                data: [3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8]
-            }]
-        });
-        element.data("dataLoaded", true);
+        var action = element.data("action");
+        $.getJSON("/DataMart/" + action, null, function (data) {
+            this._onDataLoaded(element, action, data);
+            element.data("dataLoaded", true);
+        }.bind(this));
     };
 };
 
@@ -116,6 +75,318 @@ dmProto._onViewControlClick = function (item) {
     this.viewContainers.filter(".active").find(".contentView > div").removeClass("active")
     var target = jqItem.data("target");
     this.viewContainers.filter(".active").find(target).addClass("active");
+};
+
+dmProto._onDataLoaded = function (container, action, data) {
+    switch (action) {
+        case DataMartEnum.Action.Transactions:
+            this.createTransactionsData(container, data);
+            break;
+        case DataMartEnum.Action.Amounts:
+            this.createAmountsData(container, data);
+            break;
+        case DataMartEnum.Action.Aggregations:
+            this.createAggregationsData(container, data);
+            break;
+        default:
+            break;
+    };
+};
+
+dmProto.createTransactionsData = function (container, data) {
+    var categories = [],
+        series = [{
+            name: "Прибыль",
+            data: []
+        }, {
+            name: "Покупки",
+            data: []
+        }];
+    var table = $("<table />", {
+        "class": "table table-hover"
+    });
+    table.append("<thead><tr><th>Дата</th><th>Прибыль</th><th>Покупки</th></tr></thead>")
+    $.map(data, function (item) {
+        var date = new Date(parseInt(item.Date.replace(/\D/g, ''), 10)).toDateString(),
+            purchase = item.PurchaseCount,
+            profit = parseFloat(item.Profit.toFixed(2));
+        categories.push(date);
+        series[0].data.push(profit);
+        series[1].data.push(purchase);
+        table.append("<tr><td>" + date + "</td><td>" + profit + "</td><td>" + purchase + "</td></tr>");
+    });
+    container.find(".tableView").append(table);
+    container.find(".chartView").highcharts({
+        chart: {
+            type: 'line',
+            zoomType: 'x',
+        },
+        title: {
+            text: 'Показатели транзакций',
+        },
+        xAxis: {
+            categories: categories,
+            labels: {
+                enabled: false
+            },
+            type: "datetime",
+        },
+        yAxis: {
+            title: {
+                text: "Количество"
+            }
+        },
+        series: series,
+        tooltip: {
+            shared: true,
+            crosshairs: true
+        },
+        plotOptions: {
+            series: {
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function () {
+                            hs.htmlExpand(null, {
+                                pageOrigin: {
+                                    x: this.pageX,
+                                    y: this.pageY
+                                },
+                                headingText: this.category,
+                                maincontentText: this.series.name + ': ' + this.y,
+                                width: 200
+                            });
+                        }
+                    }
+                },
+                marker: {
+                    lineWidth: 1
+                }
+            }
+        },
+    });
+};
+
+dmProto.createAmountsData = function (container, data) {
+    var columnSeries = [],
+        pieSeries = [],
+        genSeries = [],
+        catSeries = [],
+        amountsTable = $("<table />", {
+            "class": "table table-hover"
+        }),
+        genresTable = $("<table />", {
+            "class": "table table-hover"
+        }),
+        categoriesTable = $("<table />", {
+            "class": "table table-hover"
+        }),
+        usersTable = $("<table />", {
+            "class": "table table-hover"
+        });
+    amountsTable.append("<thead><tr><th>Показатель</th><th>Количество</th></tr></thead>");
+    genresTable.append("<thead><tr><th>Жанр</th><th>Количество публикаций</th></tr></thead>");
+    categoriesTable.append("<thead><tr><th>Категория</th><th>Количество публикаций</th></tr></thead>");
+    usersTable.append("<thead><tr><th>Пользователи</th><th>Количество</th></tr></thead>");
+    $.map(data, function (item) {
+        var name = item.Name,
+            amount = item.Count;
+        switch (item.Search) {
+            case "users":
+                usersTable.append("<tr><td>" + name + "</td><td>" + amount + "</td></tr>");
+                pieSeries.push([name, amount]);
+                break;
+            case "amount":
+                amountsTable.append("<tr><td>" + name + "</td><td>" + amount + "</td></tr>");
+                columnSeries.push({
+                    name: name,
+                    data: [amount],
+                    dataLabels: {
+                        enabled: true,
+                        align: 'center'
+                    }
+                });
+                break;
+            case "genre":
+                genresTable.append("<tr><td>" + name + "</td><td>" + amount + "</td></tr>");
+                genSeries.push({
+                    name: name,
+                    data: [amount],
+                    dataLabels: {
+                        enabled: true,
+                        align: 'left'
+                    }
+                });
+                break;
+            case "category":
+                categoriesTable.append("<tr><td>" + name + "</td><td>" + amount + "</td></tr>");
+                catSeries.push({
+                    name: name,
+                    data: [amount],
+                    dataLabels: {
+                        enabled: true,
+                        align: 'left'
+                    }
+                });
+                break;
+        }
+    });
+    container.find(".tableView").append(amountsTable).append(usersTable).append(categoriesTable).append(genresTable);
+    (function _renderColumnChart(series, chartCont) {
+        container.find(".chartView").append(chartCont);
+        chartCont.highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Количественные показатели'
+            },
+            xAxis: {
+                labels: {
+                    enabled: false
+                }
+            },
+            yAxis: {
+                title: "Количество"
+            },
+            tooltip: {
+                headerFormat: " "
+            },
+            series: series
+
+        });
+    })(columnSeries, $("<div />"));
+    (function _renderPieChart(series, chartCont) {
+        container.find(".chartView").append(chartCont);
+        chartCont.highcharts({
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false
+            },
+            title: {
+                text: 'Соотношение пользователей'
+            },
+            tooltip: {
+                pointFormat: '<b>{point.y}</b> ({point.percentage}%)',
+                percentageDecimals: 0
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: false
+                    },
+                    showInLegend: true
+                }
+            },
+            series: [{
+                type: 'pie',
+                data: series
+            }]
+        });
+    })(pieSeries, $("<div />"));
+    function _renderBarChart(series, chartCont, title) {
+        container.find(".chartView").append(chartCont);
+        chartCont.highcharts({
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: title
+            },
+            xAxis: {
+                labels: {
+                    enabled: false
+                }
+            },
+            yAxis: {
+                title: "Количество"
+            },
+            tooltip: {
+                headerFormat: " "
+            },
+            series: series
+        });
+    };
+    _renderBarChart(genSeries, $("<div />"), "Количество публикаций по жанрам");
+    _renderBarChart(catSeries, $("<div />"), "Количество публикаций по категориям");
+};
+
+dmProto.createAggregationsData = function (container, data) {
+    function _renderChart(series, categories, chartCont, title) {
+        container.find(".chartView").append(chartCont);
+        chartCont.highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: title
+            },
+            xAxis: {
+                labels: {
+                    enabled: true,
+                    rotation: -90
+                },
+                categories: categories
+            },
+            yAxis: {
+                title: "Количество"
+            },
+            tooltip: {
+                headerFormat: " "
+            },
+            series: series
+        });
+    };
+
+    var entityCache = {},
+        soldSeries = [{
+            name: "Публикации пользователя",
+            data: []
+        }, {
+            name: "Проданные публикации пользователя",
+            data: []
+        }],
+        priceSeries = [{
+            name: "Средняя стоимость публикации",
+            data: []
+        }, {
+            name: "Максимальная стоимость публикации",
+            data: []
+        }],
+        categories = [],
+        table = $("<table />", {
+            "class": "table table-hover"
+        });
+    table.append("<thead><tr><th>Пользователь</th><th>Публикации</th><th>Продано публикаций</th><th>Средняя стоимость</th><th>Максимальная стоимость</th></tr></thead>")
+    $.map(data, function (item) {
+        var entity = item.Entity;
+        if (!entityCache[entity]) {
+            entityCache[entity] = {}
+        }
+        if (!entityCache[entity][item.Indicator]) {
+            entityCache[entity][item.Indicator] = {};
+        }
+        entityCache[entity][item.Indicator][item.Aggregation.Name] = item.Aggregation.Value;
+    });
+    for (var key in entityCache) {
+        var values = entityCache[key],
+            allPub = parseFloat(values.all.sum ? values.all.sum.toFixed(2) : 0),
+            soldPub = parseFloat(values.sold.sum ? values.sold.sum.toFixed(2) : 0),
+            avgPrice = parseFloat(values.price.avg ? values.price.avg.toFixed(2) : 0),
+            maxPrice = parseFloat(values.price.max ? values.price.max.toFixed(2) : 0);
+        table.append("<tr><td>" + key + "</td><td>" + allPub + "</td><td>" + soldPub + "</td><td>" + avgPrice + "</td><td>" + maxPrice + "</td></tr>")
+        categories.push(key);
+        soldSeries[0].data.push(allPub);
+        soldSeries[1].data.push(soldPub);
+        priceSeries[0].data.push(avgPrice);
+        priceSeries[1].data.push(maxPrice);
+    }
+    container.find(".tableView").append(table);
+    _renderChart(soldSeries, categories, $("<div />"));
+    _renderChart(priceSeries, categories, $("<div />"));
 };
 
 dmProto = null;
