@@ -10,6 +10,6 @@ namespace Web.Code.Mongo.Aggregators
     {
         public ObjectId Id;
         public string Name;
-        public double Value;
+        public double? Value;
     }
 }

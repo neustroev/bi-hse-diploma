@@ -52,8 +52,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -136,11 +134,13 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Code\Mongo\Aggregators\IAggregator.cs" />
+    <Compile Include="Code\Mongo\Aggregators\Aggregator.cs" />
     <Compile Include="Code\Mongo\Database.cs" />
+    <Compile Include="Code\Mongo\Entities\EntityAggregation.cs" />
     <Compile Include="Code\Mongo\Entities\EntityCount.cs" />
     <Compile Include="Code\Mongo\Entities\TransactionStats.cs" />
     <Compile Include="Code\Mongo\Entities\User.cs" />
+    <Compile Include="Code\Worker\DataExportProvider.cs" />
     <Compile Include="Controllers\DataMartController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -252,7 +252,10 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+    <ProjectReference Include="..\APIServer\APIServer.csproj">
+      <Project>{fdf37b54-9da7-4e34-8bf6-81ba714ac1b4}</Project>
+      <Name>APIServer</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
