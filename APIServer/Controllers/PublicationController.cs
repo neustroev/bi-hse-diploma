@@ -20,6 +20,8 @@ namespace APIServer.Controllers
 		{
 			var output = _db.Publication.AsQueryable();
 
+			_db.Genre.OrderByDescending(o => o.PublicationGenre.Sum(x => x.Publication.Chapter.Sum(y => y.Transaction.Count)));
+
 			if (user != null)
 				output = output.Where(o => o.UserId == user);
 			if (!string.IsNullOrWhiteSpace(query))
@@ -37,6 +39,8 @@ namespace APIServer.Controllers
 			}
 			if (limit != null)
 				output = output.Take((int)limit);
+			if (!random)
+				output = output.OrderByDescending(o => o.Id);
 			List<object> obj = new List<object>();
 			foreach (var item in output)
 			{
