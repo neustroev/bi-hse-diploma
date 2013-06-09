@@ -33,6 +33,7 @@ namespace Web.Code.Mongo
             public static readonly string Aggregations = "EntityAggregation";
             public static readonly string Counts = "EntityCount";
             public static readonly string Transactions = "TransactionStats";
+            public static readonly string Ratings = "Ratings";
         }
 
         private MongoServer _server;
@@ -59,18 +60,6 @@ namespace Web.Code.Mongo
                 }
                 return _db;
             }
-        }
-
-        public ObjectId IsUser(string login, string password)
-        {
-            var user = Db.GetCollection<User>("Users").FindOne(Query.And(Query.EQ("Login", login), Query.EQ("Password", password)));
-            return user.Id;
-        }
-
-        public bool IsUser(string id)
-        {
-            var user = Db.GetCollection<User>("Users").FindOneById(id);
-            return user != null;
         }
 
         public void InsertCollection<T>(List<T> list, string collectionName)

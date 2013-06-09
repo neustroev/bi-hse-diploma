@@ -7,53 +7,55 @@ using System.Web.Mvc;
 using Web.Code.Mongo;
 using Web.Code.DataExportProvider;
 using Web.Code.Mongo.Entities;
+using Web.Models;
+using System.Threading;
 
 namespace Web.Controllers
 {
     public class DataMartController : Controller
     {
         public ActionResult Index()
-        {
+        {            
             return View();
-            //return RedirectToAction("Login", "DataMart");
         }
 
-        public ActionResult Login()
+        public JsonResult UpdateData(DataMartModel model)
         {
-            return RedirectToAction("Index", "DataMart");
-            //return View();
+            try
+            {
+                model.UpdateDatabase();
+                return Json(new
+                {
+                    Success = true
+                });
+            }
+            catch (Exception)
+            {
+                return Json(new
+                {
+                    Success = false
+                });
+            }
         }
 
-        [HttpPost]
-        public ActionResult Login(string login, string password)
+        public JsonResult GetTransactions(DataMartModel model)
         {
-            return RedirectToAction("Index", "DataMart");
-            //return View("Login");
+            return Json(model.GetTransactions(), JsonRequestBehavior.AllowGet);
         }
 
-        //private bool _validateUser(string id)
-        //{
-        //    return Database.Instance.IsUser(id);
-        //}
-
-        public void SuperAction()
+        public JsonResult GetAmounts(DataMartModel model)
         {
-            DataExportProvider.Instance.Export();
+            return Json(model.GetAmounts(), JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult GetTransactions()
+        public JsonResult GetAggregations(DataMartModel model)
         {
-            return Json(Database.Instance.GetCollection<TransactionStats>(Database.CollectionNames.Transactions), JsonRequestBehavior.AllowGet);
+            return Json(model.GetAggregations(), JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult GetAmounts()
+        public JsonResult GetRatings(DataMartModel model)
         {
-            return Json(Database.Instance.GetCollection<EntityCount>(Database.CollectionNames.Counts), JsonRequestBehavior.AllowGet);
-        }
-
-        public JsonResult GetAggregations()
-        {
-            return Json(Database.Instance.GetCollection<EntityAggregation>(Database.CollectionNames.Aggregations), JsonRequestBehavior.AllowGet);
+            return Json(model.GetRatings(), JsonRequestBehavior.AllowGet);
         }
     }
 }
