@@ -361,6 +361,9 @@ dmProto.createAggregationsData = function (container, data) {
                 labels: {
                     enabled: false,
                 },
+                title: {
+                    text: "Пользователи"
+                }                
             },
             yAxis: {
                 title: "Количество",
@@ -436,7 +439,7 @@ dmProto.createAggregationsData = function (container, data) {
         });
     }
     container.find(".tableView").append("<h2>Статистика по публикациям пользователей</h2>").append(table);
-    _renderChart(soldSeries, $("<div />"), "percent", "Соотношение публикаций");
+    _renderChart(soldSeries, $("<div />"), "normal", "Соотношение публикаций");
     _renderChart(priceSeries, $("<div />"), null, "Цены на публикации");
 };
 
