@@ -59,7 +59,7 @@
           </Key>
           <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
           <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
-          <Property Name="Content" Type="varbinary(max)" Nullable="false" />
+          <Property Name="Content" Type="varbinary(max)" />
           <Property Name="Price" Type="float" Nullable="false" />
           <Property Name="Publication_Id" Type="int" Nullable="false" />
         </EntityType>
@@ -83,11 +83,11 @@
         </EntityType>
         <EntityType Name="PublicationGenre">
           <Key>
-            <PropertyRef Name="Publication_Id" />
-            <PropertyRef Name="Genre_Id" />
+            <PropertyRef Name="PublicationGenre_Id" />
           </Key>
           <Property Name="Publication_Id" Type="int" Nullable="false" />
           <Property Name="Genre_Id" Type="int" Nullable="false" />
+          <Property Name="PublicationGenre_Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
         </EntityType>
         <EntityType Name="Transaction">
           <Key>
@@ -217,6 +217,7 @@
           <EntitySet Name="Chapter" EntityType="BookStoreModel.Chapter" />
           <EntitySet Name="Genre" EntityType="BookStoreModel.Genre" />
           <EntitySet Name="Publication" EntityType="BookStoreModel.Publication" />
+          <EntitySet Name="PublicationGenre" EntityType="BookStoreModel.PublicationGenre" />
           <EntitySet Name="Transaction" EntityType="BookStoreModel.Transaction" />
           <EntitySet Name="User" EntityType="BookStoreModel.User" />
           <AssociationSet Name="FK_PublicationCategory" Association="BookStoreModel.FK_PublicationCategory">
@@ -235,6 +236,14 @@
             <End Role="Genre" EntitySet="Genre" />
             <End Role="Genre1" EntitySet="Genre" />
           </AssociationSet>
+          <AssociationSet Name="FK_PublicationGenre_Genre" Association="BookStoreModel.FK_PublicationGenre_Genre">
+            <End Role="Genre" EntitySet="Genre" />
+            <End Role="PublicationGenre" EntitySet="PublicationGenre" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PublicationGenre_Publication" Association="BookStoreModel.FK_PublicationGenre_Publication">
+            <End Role="Publication" EntitySet="Publication" />
+            <End Role="PublicationGenre" EntitySet="PublicationGenre" />
+          </AssociationSet>
           <AssociationSet Name="FK_UserPublication" Association="BookStoreModel.FK_UserPublication">
             <End Role="User" EntitySet="User" />
             <End Role="Publication" EntitySet="Publication" />
@@ -242,10 +251,6 @@
           <AssociationSet Name="FK_UserTransaction" Association="BookStoreModel.FK_UserTransaction">
             <End Role="User" EntitySet="User" />
             <End Role="Transaction" EntitySet="Transaction" />
-          </AssociationSet>
-          <AssociationSet Name="PublicationGenre" Association="BookStoreModel.PublicationGenre">
-            <End Role="Genre" EntitySet="Genre" />
-            <End Role="Publication" EntitySet="Publication" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="Category">
@@ -262,7 +267,7 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
           <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
-          <Property Name="Content" Type="Binary" Nullable="false" MaxLength="Max" FixedLength="false" />
+          <Property Name="Content" Type="Binary" MaxLength="Max" FixedLength="false" />
           <Property Name="Price" Type="Double" Nullable="false" />
           <Property Name="Publication_Id" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Publication" Relationship="BookStoreModel.FK_ChapterPublication" FromRole="Chapter" ToRole="Publication" />
@@ -277,7 +282,7 @@
           <Property Name="ParentGenre_Id" Type="Int32" />
           <NavigationProperty Name="Genre1" Relationship="BookStoreModel.FK_GenreGenre" FromRole="Genre" ToRole="Genre1" />
           <NavigationProperty Name="Genre2" Relationship="BookStoreModel.FK_GenreGenre" FromRole="Genre1" ToRole="Genre" />
-          <NavigationProperty Name="Publication" Relationship="BookStoreModel.PublicationGenre" FromRole="Genre" ToRole="Publication" />
+          <NavigationProperty Name="PublicationGenre" Relationship="BookStoreModel.FK_PublicationGenre_Genre" FromRole="Genre" ToRole="PublicationGenre" />
         </EntityType>
         <EntityType Name="Publication">
           <Key>
@@ -290,8 +295,18 @@
           <Property Name="Category_Id" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Category" Relationship="BookStoreModel.FK_PublicationCategory" FromRole="Publication" ToRole="Category" />
           <NavigationProperty Name="Chapter" Relationship="BookStoreModel.FK_ChapterPublication" FromRole="Publication" ToRole="Chapter" />
+          <NavigationProperty Name="PublicationGenre" Relationship="BookStoreModel.FK_PublicationGenre_Publication" FromRole="Publication" ToRole="PublicationGenre" />
           <NavigationProperty Name="User" Relationship="BookStoreModel.FK_UserPublication" FromRole="Publication" ToRole="User" />
-          <NavigationProperty Name="Genre" Relationship="BookStoreModel.PublicationGenre" FromRole="Publication" ToRole="Genre" />
+        </EntityType>
+        <EntityType Name="PublicationGenre">
+          <Key>
+            <PropertyRef Name="PublicationGenre_Id" />
+          </Key>
+          <Property Name="Publication_Id" Type="Int32" Nullable="false" />
+          <Property Name="Genre_Id" Type="Int32" Nullable="false" />
+          <Property Name="PublicationGenre_Id" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="Genre" Relationship="BookStoreModel.FK_PublicationGenre_Genre" FromRole="PublicationGenre" ToRole="Genre" />
+          <NavigationProperty Name="Publication" Relationship="BookStoreModel.FK_PublicationGenre_Publication" FromRole="PublicationGenre" ToRole="Publication" />
         </EntityType>
         <EntityType Name="Transaction">
           <Key>
@@ -316,9 +331,9 @@
           <Property Name="Email" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
           <Property Name="Birthdate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="Balance" Type="Double" Nullable="false" />
+          <Property Name="Salt" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
           <NavigationProperty Name="Publication" Relationship="BookStoreModel.FK_UserPublication" FromRole="User" ToRole="Publication" />
           <NavigationProperty Name="Transaction" Relationship="BookStoreModel.FK_UserTransaction" FromRole="User" ToRole="Transaction" />
-          <Property Type="String" Name="Salt" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
         <Association Name="FK_PublicationCategory">
           <End Role="Category" Type="BookStoreModel.Category" Multiplicity="1" />
@@ -368,6 +383,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_PublicationGenre_Genre">
+          <End Role="Genre" Type="BookStoreModel.Genre" Multiplicity="1" />
+          <End Role="PublicationGenre" Type="BookStoreModel.PublicationGenre" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Genre">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PublicationGenre">
+              <PropertyRef Name="Genre_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PublicationGenre_Publication">
+          <End Role="Publication" Type="BookStoreModel.Publication" Multiplicity="1" />
+          <End Role="PublicationGenre" Type="BookStoreModel.PublicationGenre" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Publication">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PublicationGenre">
+              <PropertyRef Name="Publication_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_UserPublication">
           <End Role="User" Type="BookStoreModel.User" Multiplicity="1" />
           <End Role="Publication" Type="BookStoreModel.Publication" Multiplicity="*" />
@@ -391,10 +430,6 @@
               <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
-        </Association>
-        <Association Name="PublicationGenre">
-          <End Role="Genre" Type="BookStoreModel.Genre" Multiplicity="*" />
-          <End Role="Publication" Type="BookStoreModel.Publication" Multiplicity="*" />
         </Association>
       </Schema>
     </edmx:ConceptualModels>
@@ -441,6 +476,15 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="PublicationGenre">
+            <EntityTypeMapping TypeName="BookStoreModel.PublicationGenre">
+              <MappingFragment StoreEntitySet="PublicationGenre">
+                <ScalarProperty Name="Publication_Id" ColumnName="Publication_Id" />
+                <ScalarProperty Name="Genre_Id" ColumnName="Genre_Id" />
+                <ScalarProperty Name="PublicationGenre_Id" ColumnName="PublicationGenre_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Transaction">
             <EntityTypeMapping TypeName="BookStoreModel.Transaction">
               <MappingFragment StoreEntitySet="Transaction">
@@ -455,7 +499,6 @@
           <EntitySetMapping Name="User">
             <EntityTypeMapping TypeName="BookStoreModel.User">
               <MappingFragment StoreEntitySet="User">
-                <ScalarProperty Name="Salt" ColumnName="Salt" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Password" ColumnName="Password" />
                 <ScalarProperty Name="Login" ColumnName="Login" />
@@ -463,17 +506,10 @@
                 <ScalarProperty Name="Email" ColumnName="Email" />
                 <ScalarProperty Name="Birthdate" ColumnName="Birthdate" />
                 <ScalarProperty Name="Balance" ColumnName="Balance" />
+                <ScalarProperty Name="Salt" ColumnName="Salt" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <AssociationSetMapping Name="PublicationGenre" TypeName="BookStoreModel.PublicationGenre" StoreEntitySet="PublicationGenre">
-            <EndProperty Name="Genre">
-              <ScalarProperty Name="Id" ColumnName="Genre_Id" />
-            </EndProperty>
-            <EndProperty Name="Publication">
-              <ScalarProperty Name="Id" ColumnName="Publication_Id" />
-            </EndProperty>
-          </AssociationSetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

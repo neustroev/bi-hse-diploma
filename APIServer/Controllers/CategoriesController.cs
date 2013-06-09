@@ -9,18 +9,30 @@ using System.Web.Http;
 
 namespace APIServer.Controllers
 {
-	[TokenAuth]
-    public class CategoriesController : ApiController
-    {
+	//[TokenAuth]
+	public class CategoriesController : ApiController
+	{
 		private BookStoreEntities _db = new BookStoreEntities();
 
-		public object Get()
+		public object Get(string ids = "")
 		{
-			return _db.Category.Select(o => new
+			if (!string.IsNullOrWhiteSpace(ids))
 			{
-				id = o.Id,
-				name = o.Name
-			});
+				List<int> id = ids.Split(',').Select(o => Convert.ToInt32(o)).ToList();
+				return _db.Category.Where(o => id.Contains(o.Id)).Select(o => new
+						{
+							id = o.Id,
+							name = o.Name
+						});
+			}
+			else
+			{
+				return _db.Category.Select(o => new
+				{
+					id = o.Id,
+					name = o.Name
+				});
+			}
 		}
-    }
+	}
 }

@@ -17,7 +17,7 @@ namespace APIServer.Models
         public Publication()
         {
             this.Chapter = new HashSet<Chapter>();
-            this.Genre = new HashSet<Genre>();
+            this.PublicationGenre = new HashSet<PublicationGenre>();
         }
     
         public int Id { get; set; }
@@ -28,7 +28,7 @@ namespace APIServer.Models
     
         public virtual Category Category { get; set; }
         public virtual ICollection<Chapter> Chapter { get; set; }
+        public virtual ICollection<PublicationGenre> PublicationGenre { get; set; }
         public virtual User User { get; set; }
-        public virtual ICollection<Genre> Genre { get; set; }
     }
 }

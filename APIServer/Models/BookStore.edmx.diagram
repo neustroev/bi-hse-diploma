@@ -4,20 +4,22 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="eab2c184f1b542b2bed0e1915a3583ab" Name="Diagram1">
-        <EntityTypeShape EntityType="BookStoreModel.Category" Width="1.5" PointX="0.75" PointY="4.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="BookStoreModel.Chapter" Width="1.5" PointX="5.25" PointY="1.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="BookStoreModel.Genre" Width="1.5" PointX="0.75" PointY="7" IsExpanded="true" />
-        <EntityTypeShape EntityType="BookStoreModel.Publication" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
-        <EntityTypeShape EntityType="BookStoreModel.Transaction" Width="1.5" PointX="7.5" PointY="1.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="BookStoreModel.User" Width="1.5" PointX="0.75" PointY="1" IsExpanded="true" />
+      <Diagram DiagramId="cc8ba4856ce44b88a8a20a906554f1ee" Name="Diagram1">
+        <EntityTypeShape EntityType="BookStoreModel.Category" Width="1.5" PointX="0.75" PointY="9" IsExpanded="true" />
+        <EntityTypeShape EntityType="BookStoreModel.Chapter" Width="1.5" PointX="5.25" PointY="3.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="BookStoreModel.Genre" Width="1.5" PointX="3" PointY="7.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="BookStoreModel.Publication" Width="1.5" PointX="3" PointY="3.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="BookStoreModel.PublicationGenre" Width="1.5" PointX="5.25" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="BookStoreModel.Transaction" Width="1.5" PointX="7.5" PointY="3.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="BookStoreModel.User" Width="1.5" PointX="0.75" PointY="3.25" IsExpanded="true" />
         <AssociationConnector Association="BookStoreModel.FK_PublicationCategory" ManuallyRouted="false" />
         <AssociationConnector Association="BookStoreModel.FK_ChapterPublication" ManuallyRouted="false" />
         <AssociationConnector Association="BookStoreModel.FK_TransactionChapter" ManuallyRouted="false" />
         <AssociationConnector Association="BookStoreModel.FK_GenreGenre" ManuallyRouted="false" />
+        <AssociationConnector Association="BookStoreModel.FK_PublicationGenre_Genre" ManuallyRouted="false" />
+        <AssociationConnector Association="BookStoreModel.FK_PublicationGenre_Publication" ManuallyRouted="false" />
         <AssociationConnector Association="BookStoreModel.FK_UserPublication" ManuallyRouted="false" />
         <AssociationConnector Association="BookStoreModel.FK_UserTransaction" ManuallyRouted="false" />
-        <AssociationConnector Association="BookStoreModel.PublicationGenre" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

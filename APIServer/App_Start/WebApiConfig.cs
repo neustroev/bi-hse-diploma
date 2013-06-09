@@ -13,20 +13,32 @@ namespace APIServer
 			config.Routes.MapHttpRoute(
 				name: "register",
 				routeTemplate: "register",
-				defaults: new { controller = "auth", action = "register"}
+				defaults: new { controller = "auth", action = "register" }
+			);
+
+			config.Routes.MapHttpRoute(
+				name: "writer_rating",
+				routeTemplate: "writer_rating",
+				defaults: new { controller = "user", action = "WriterRating" }
+			);
+
+			config.Routes.MapHttpRoute(
+				name: "genre_rating",
+				routeTemplate: "genre_rating",
+				defaults: new { controller = "publication", action = "GenreRating" }
 			);
 
 			config.Routes.MapHttpRoute("DefaultApiGet",
-				"{controller}/{id}",
-				new { id = RouteParameter.Optional, action = "Get" },
+				"{controller}",
+				new { action = "Get" },
 				new { method = new System.Web.Http.Routing.HttpMethodConstraint(HttpMethod.Get, HttpMethod.Options) });
 
 			config.Routes.MapHttpRoute("DefaultApiPost",
-				"{controller}/{id}",
-				new { id = RouteParameter.Optional, action = "Post" },
+				"{controller}",
+				new { action = "Post" },
 				new { method = new System.Web.Http.Routing.HttpMethodConstraint(HttpMethod.Post, HttpMethod.Options) });
 
-
+			
 			// Uncomment the following line of code to enable query support for actions with an IQueryable or IQueryable<T> return type.
 			// To avoid processing unexpected or malicious queries, use the validation settings on QueryableAttribute to validate incoming queries.
 			// For more information, visit http://go.microsoft.com/fwlink/?LinkId=279712.

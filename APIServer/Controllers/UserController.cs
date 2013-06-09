@@ -11,11 +11,11 @@ using APIServer.Code.Attribute;
 
 namespace APIServer.Controllers
 {
-	[TokenAuth]
-    public class UserController : ApiController
-    {
+	public class UserController : ApiController
+	{
 		private BookStoreEntities _db = new BookStoreEntities();
 
+		[TokenAuth]
 		public object Get(int id)
 		{
 			var user = _db.User.FirstOrDefault(o => o.Id == id);
@@ -29,5 +29,16 @@ namespace APIServer.Controllers
 				balance = user.Balance
 			};
 		}
-    }
+
+		[HttpGet]
+		public object WriterRating(int top = 10)
+		{
+			return _db.User.OrderByDescending(o => o.Transaction.Where(x => x.UserId == o.Id).Count()).Take(top).Select(o => new
+			{
+				id = o.Id,
+				name = o.Name,
+				count = o.Transaction.Where(x => x.UserId == o.Id).Count()
+			}).ToList();
+		}
+	}
 }

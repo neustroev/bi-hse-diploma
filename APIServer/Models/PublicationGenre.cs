@@ -12,20 +12,13 @@ namespace APIServer.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Genre
+    public partial class PublicationGenre
     {
-        public Genre()
-        {
-            this.Genre1 = new HashSet<Genre>();
-            this.PublicationGenre = new HashSet<PublicationGenre>();
-        }
+        public int Publication_Id { get; set; }
+        public int Genre_Id { get; set; }
+        public int PublicationGenre_Id { get; set; }
     
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public Nullable<int> ParentGenre_Id { get; set; }
-    
-        public virtual ICollection<Genre> Genre1 { get; set; }
-        public virtual Genre Genre2 { get; set; }
-        public virtual ICollection<PublicationGenre> PublicationGenre { get; set; }
+        public virtual Genre Genre { get; set; }
+        public virtual Publication Publication { get; set; }
     }
 }

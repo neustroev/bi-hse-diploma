@@ -10,6 +10,9 @@ using APIServer.Code.Extensions;
 using System.Security.Cryptography;
 using System.Text;
 using System.Globalization;
+using System.IO;
+using System.Threading;
+using System.Web.Mvc;
 
 namespace APIServer.Controllers
 {
@@ -19,22 +22,36 @@ namespace APIServer.Controllers
 
 		public object Post([FromBody]dynamic data)
 		{
-			string email = data.email;
-			string pss = data.password;
-			var user = _db.User.FirstOrDefault(o => o.Email == email);
-			if (user == null)
-				throw new HttpResponseException(Request.GenerateCustomError(ErrorEnum.InvalidQueryParameterValue));
-			if (GetMd5Hash(pss) != user.Password)
-				throw new HttpResponseException(Request.GenerateCustomError(ErrorEnum.InvalidAuthenticationInfo));
-			user.Salt = GenerateSalt();
-			_db.SaveChanges();
-			var mt = GetMd5Hash(user.Email + user.Salt);
-			return new
+			try
 			{
-				access_token = user.Id.ToString() + '-' + mt,
-				id = user.Id,
-				name = user.Name
-			};
+				if (data == null)
+					throw new HttpResponseException(Request.GenerateCustomError(ErrorEnum.InvalidQueryParameterValue));
+				string email = data.email;
+				string pss = data.password;
+
+				var user = _db.User.FirstOrDefault(o => o.Email == email);
+				if (user == null)
+					throw new HttpResponseException(Request.GenerateCustomError(ErrorEnum.InvalidQueryParameterValue));
+				if (GetMd5Hash(pss) != user.Password)
+					throw new HttpResponseException(Request.GenerateCustomError(ErrorEnum.InvalidAuthenticationInfo));
+				user.Salt = GenerateSalt();
+				_db.SaveChanges();
+				var mt = GetMd5Hash(user.Email + user.Salt);
+				return new
+				{
+					access_token = user.Id.ToString() + '-' + mt,
+					id = user.Id,
+					name = user.Name
+				};
+			}
+			catch (Exception ex)
+			{
+				return new
+				{
+					error = ex.Message,
+					error2 = ex.InnerException.Message
+				};
+			}
 		}
 
 		public object Register([FromBody]dynamic data)
@@ -45,7 +62,7 @@ namespace APIServer.Controllers
 			string birthday = data.birthday;
 			DateTime birth = new DateTime();
 			if (!DateTime.TryParse(birthday, CultureInfo.GetCultureInfo("ru-RU"), DateTimeStyles.None, out birth))
-				throw new HttpResponseException(Request.GenerateCustomError(ErrorEnum.InvalidQueryParameterValue));
+				birth = DateTime.Now;
 			var hash = GetMd5Hash(pss);
 			_db.User.Add(new User()
 			{
