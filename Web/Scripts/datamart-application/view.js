@@ -3,7 +3,11 @@
     DataMartEnum.Action = {
         Transactions: "GetTransactions",
         Amounts: "GetAmounts",
-        Aggregations: "GetAggregations"
+        Aggregations: "GetAggregations",
+        Ratings: "GetRatings"
+    }
+    DataMartEnum.TableSettings = {
+        Class: "well table table-hover table-condensed"
     }
 })();
 
@@ -11,6 +15,8 @@ DataMart = function (settings) {
     this.navigationPanel = settings.navigationPanel;
     this.viewContainers = settings.viewContainers;
     this.viewControls = settings.viewControls;
+    this.updateDataControl = settings.updateControl;
+    this.loader = settings.loader;
 
     this._init();
 };
@@ -39,15 +45,25 @@ dmProto.applyEvents = function () {
         var item = this;
         self._onViewControlClick(item);
     });
+    self.updateDataControl.on("click", function (ev) {
+        ev.preventDefault();
+        self.loader.show();
+        $.post("/DataMart/UpdateData", self._onDataUpdated.bind(self));
+    });
+
 };
 
 dmProto.showViewContent = function (element) {
-    element.addClass("active");
-    if (!element.data("dataLoaded")) {
+    element.addClass("active");   
+    if (!element.attr("dataLoaded")) {
+        this.loader.show();
+        element.find(".chartView").empty();
+        element.find(".tableView").empty();
         var action = element.data("action");
         $.getJSON("/DataMart/" + action, null, function (data) {
             this._onDataLoaded(element, action, data);
-            element.data("dataLoaded", true);
+            element.attr("dataLoaded", true);
+            this.loader.hide();
         }.bind(this));
     };
 };
@@ -88,9 +104,23 @@ dmProto._onDataLoaded = function (container, action, data) {
         case DataMartEnum.Action.Aggregations:
             this.createAggregationsData(container, data);
             break;
+        case DataMartEnum.Action.Ratings:
+            this.createRatingsData(container, data);
         default:
             break;
     };
+};
+
+dmProto._onDataUpdated = function (data) {
+    this.loader.hide();
+    if (data.Success) {
+        var currentElement = $("[dataLoaded].active");
+        $("[dataLoaded]").removeAttr("dataloaded");
+        this.showViewContent(currentElement);
+    }
+    else {
+        alert("Ошибка обновления данных");
+    }
 };
 
 dmProto.createTransactionsData = function (container, data) {
@@ -103,11 +133,11 @@ dmProto.createTransactionsData = function (container, data) {
             data: []
         }];
     var table = $("<table />", {
-        "class": "table table-hover"
-    });
+        "class": DataMartEnum.TableSettings.Class
+    });    
     table.append("<thead><tr><th>Дата</th><th>Прибыль</th><th>Покупки</th></tr></thead>")
     $.map(data, function (item) {
-        var date = new Date(parseInt(item.Date.replace(/\D/g, ''), 10)).toDateString(),
+        var date = new Date(parseInt(item.Date.replace(/\D/g, ''), 10)).toLocaleDateString(),
             purchase = item.PurchaseCount,
             profit = parseFloat(item.Profit.toFixed(2));
         categories.push(date);
@@ -115,7 +145,7 @@ dmProto.createTransactionsData = function (container, data) {
         series[1].data.push(purchase);
         table.append("<tr><td>" + date + "</td><td>" + profit + "</td><td>" + purchase + "</td></tr>");
     });
-    container.find(".tableView").append(table);
+    container.find(".tableView").append("<h2>Ежедневные транзакции</h2>").append(table);
     container.find(".chartView").highcharts({
         chart: {
             type: 'line',
@@ -173,18 +203,18 @@ dmProto.createAmountsData = function (container, data) {
         genSeries = [],
         catSeries = [],
         amountsTable = $("<table />", {
-            "class": "table table-hover"
+            "class": DataMartEnum.TableSettings.Class
         }),
         genresTable = $("<table />", {
-            "class": "table table-hover"
+            "class": DataMartEnum.TableSettings.Class
         }),
         categoriesTable = $("<table />", {
-            "class": "table table-hover"
+            "class": DataMartEnum.TableSettings.Class
         }),
         usersTable = $("<table />", {
-            "class": "table table-hover"
+            "class": DataMartEnum.TableSettings.Class
         });
-    amountsTable.append("<thead><tr><th>Показатель</th><th>Количество</th></tr></thead>");
+    amountsTable.append("<thead><tr><th>Показатель</th><th>Значение</th></tr></thead>");
     genresTable.append("<thead><tr><th>Жанр</th><th>Количество публикаций</th></tr></thead>");
     categoriesTable.append("<thead><tr><th>Категория</th><th>Количество публикаций</th></tr></thead>");
     usersTable.append("<thead><tr><th>Пользователи</th><th>Количество</th></tr></thead>");
@@ -231,7 +261,10 @@ dmProto.createAmountsData = function (container, data) {
                 break;
         }
     });
-    container.find(".tableView").append(amountsTable).append(usersTable).append(categoriesTable).append(genresTable);
+    container.find(".tableView").append("<h2>Количественные показатели</h2>").append(amountsTable)
+        .append("<h2>Соотношение пользователей</h2>").append(usersTable)
+        .append("<h2>Публикации по жанрам</h2>").append(categoriesTable)
+        .append("<h2>Публикации по категориям</h2>").append(genresTable);
     (function _renderColumnChart(series, chartCont) {
         container.find(".chartView").append(chartCont);
         chartCont.highcharts({
@@ -315,7 +348,7 @@ dmProto.createAmountsData = function (container, data) {
 };
 
 dmProto.createAggregationsData = function (container, data) {
-    function _renderChart(series, categories, chartCont, title) {
+    function _renderChart(series, chartCont, stacking, title) {
         container.find(".chartView").append(chartCont);
         chartCont.highcharts({
             chart: {
@@ -326,16 +359,25 @@ dmProto.createAggregationsData = function (container, data) {
             },
             xAxis: {
                 labels: {
-                    enabled: true,
-                    rotation: -90
+                    enabled: false,
                 },
-                categories: categories
+                title: {
+                    text: "Пользователи"
+                }                
             },
             yAxis: {
-                title: "Количество"
+                title: "Количество",
+                stackLabels: {
+                    enabled: true,
+                }
             },
             tooltip: {
-                headerFormat: " "
+                headerFormat: "Пользователь {point.key}<br />"
+            },
+            plotOptions: {
+                column: {
+                    stacking: stacking,
+                }
             },
             series: series
         });
@@ -343,10 +385,10 @@ dmProto.createAggregationsData = function (container, data) {
 
     var entityCache = {},
         soldSeries = [{
-            name: "Публикации пользователя",
+            name: "Непроданные публикации",
             data: []
         }, {
-            name: "Проданные публикации пользователя",
+            name: "Проданные публикации",
             data: []
         }],
         priceSeries = [{
@@ -358,9 +400,10 @@ dmProto.createAggregationsData = function (container, data) {
         }],
         categories = [],
         table = $("<table />", {
-            "class": "table table-hover"
+            "class": DataMartEnum.TableSettings.Class
         });
     table.append("<thead><tr><th>Пользователь</th><th>Публикации</th><th>Продано публикаций</th><th>Средняя стоимость</th><th>Максимальная стоимость</th></tr></thead>")
+    window.a = data;
     $.map(data, function (item) {
         var entity = item.Entity;
         if (!entityCache[entity]) {
@@ -378,15 +421,141 @@ dmProto.createAggregationsData = function (container, data) {
             avgPrice = parseFloat(values.price.avg ? values.price.avg.toFixed(2) : 0),
             maxPrice = parseFloat(values.price.max ? values.price.max.toFixed(2) : 0);
         table.append("<tr><td>" + key + "</td><td>" + allPub + "</td><td>" + soldPub + "</td><td>" + avgPrice + "</td><td>" + maxPrice + "</td></tr>")
-        categories.push(key);
-        soldSeries[0].data.push(allPub);
-        soldSeries[1].data.push(soldPub);
-        priceSeries[0].data.push(avgPrice);
-        priceSeries[1].data.push(maxPrice);
+        soldSeries[0].data.push({
+            y: allPub - soldPub,
+            name: key
+        });
+        soldSeries[1].data.push({
+            y: soldPub,
+            name: key
+        });
+        priceSeries[0].data.push({
+            y: avgPrice,
+            name: key
+        });
+        priceSeries[1].data.push({
+            y: maxPrice,
+            name: key
+        });
     }
-    container.find(".tableView").append(table);
-    _renderChart(soldSeries, categories, $("<div />"));
-    _renderChart(priceSeries, categories, $("<div />"));
+    container.find(".tableView").append("<h2>Статистика по публикациям пользователей</h2>").append(table);
+    _renderChart(soldSeries, $("<div />"), "normal", "Соотношение публикаций");
+    _renderChart(priceSeries, $("<div />"), null, "Цены на публикации");
+};
+
+dmProto.createRatingsData = function (container, data) {
+    var writerSeries = [{
+        name: "Проданные публикации",
+        data: []
+    }],
+        catSeries = [],
+        genSeries = [],
+        writerTable = $("<table />", {
+            "class": DataMartEnum.TableSettings.Class
+        }),
+        genTable = $("<table />", {
+            "class": DataMartEnum.TableSettings.Class
+        }),
+        catTable = $("<table />", {
+            "class": DataMartEnum.TableSettings.Class
+        });
+    writerTable.append("<thead><tr><th>Пользователь</th><th>Куплено публикаций</th></tr></thead>");
+    genTable.append("<thead><tr><th>Жанр</th><th>Куплено публикаций</th></tr></thead>");
+    catTable.append("<thead><tr><th>Категория</th><th>Куплено публикаций</th></tr></thead>");
+
+    function _renderWriterRatingChart(series, chartCont) {
+        container.find(".chartView").append(chartCont);
+        chartCont.highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: "Рейтинг авторов"
+            },
+            xAxis: {
+                labels: {
+                    enabled: false,
+                },
+            },
+            yAxis: {
+                title: "Количество"
+            },
+            tooltip: {
+                headerFormat: "{point.key}<br />"
+            },
+            series: series
+        });
+    };
+    function _renderColumnRatingChart(series, chartCont, title) {
+        container.find(".chartView").append(chartCont);
+        chartCont.highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: title
+            },
+            xAxis: {
+                labels: {
+                    enabled: false,
+                },
+            },
+            yAxis: {
+                title: "Количество"
+            },
+            tooltip: {
+                headerFormat: "{point.series.name}<br/>",
+                pointFormat: "Продано публикаций: {point.y}"
+            },
+            series: series
+        });
+    };
+    $.map(data, function (item) {
+        var name = item.Name,
+            count = item.Count;
+        switch (item.Search) {
+            case "writer":
+                if (count > 0) {
+                    writerSeries[0].data.push({
+                        name: name,
+                        y: count
+                    });
+                    writerTable.append("<tr><td>" + name + "</td><td>" + count + "</td></tr>");
+                }
+                break;
+            case "genre":
+                genSeries.push({
+                    name: name,
+                    data: [count],
+                    dataLabels: {
+                        enabled: true,
+                        align: 'center'
+                    }
+                });
+                genTable.append("<tr><td>" + name + "</td><td>" + count + "</td></tr>");
+                break;
+            case "category":
+                catSeries.push({
+                    name: name,
+                    data: [count],
+                    dataLabels: {
+                        enabled: true,
+                        align: 'center'
+                    }
+                });
+                catTable.append("<tr><td>" + name + "</td><td>" + count + "</td></tr>");
+                break;
+        }
+
+    });
+    container.find(".tableView").append("<h2>Рейтинг авторов</h2>").append(writerTable)
+        .append("<h2>Рейтинг жанров</h2>").append(genTable)
+        .append("<h2>Рейтинг категорий</h2>").append(catTable);
+
+    _renderWriterRatingChart(writerSeries, $("<div />"));
+    _renderColumnRatingChart(genSeries, $("<div />"), "Рейтинг жанров");
+    _renderColumnRatingChart(catSeries, $("<div />"), "Рейтинг категорий");
+
 };
 
 dmProto = null;

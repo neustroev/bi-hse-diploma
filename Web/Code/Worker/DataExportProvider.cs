@@ -44,7 +44,7 @@ namespace Web.Code.DataExportProvider
                                 select new EntityCount()
                                 {
                                     Name = p.Name,
-                                    Count = p.Publication.Count,
+                                    Count = p.PublicationGenre.Count,
                                     Search = "genre"
                                 }).OrderByDescending(x => x.Count);
 
@@ -190,11 +190,49 @@ namespace Web.Code.DataExportProvider
                     }).ToList();
         }
 
+        private List<EntityCount> GenerateRatingsCollection()
+        {
+            List<EntityCount> batch = new List<EntityCount>();
+            var genreRating = DataExportProvider.Instance.DBModel.Genre.Select(o => new EntityCount()
+            {
+                Search = "genre",
+                Name = o.Name,
+                Count = o.PublicationGenre.Sum(x => x.Publication.Chapter.Sum(y => y.Transaction.Count))
+            });
+            var writerRating = DataExportProvider.Instance.DBModel.User.OrderByDescending(o => o.Transaction.Where(x => x.UserId == o.Id).Count()).Select(o => new EntityCount()
+            {
+                Search = "writer",
+                Name = o.Name,
+                Count = o.Transaction.Where(x => x.UserId == o.Id).Count()
+            });
+
+            var categoryRating = DataExportProvider.Instance.DBModel.Category.Select(o => new EntityCount()
+            {
+                Search = "category",
+                Name = o.Name,
+                Count = o.Publication.Sum(x => x.Chapter.Sum(y => y.Transaction.Count))
+            });
+
+            batch = batch
+                .Union(genreRating)
+                .Union(writerRating)
+                .Union(categoryRating)
+                .ToList();
+
+            return batch;
+        }
+
         public void Export()
         {
             Database.Instance.InsertCollection(this.GenerateAggregationsCollection(), Database.CollectionNames.Aggregations);
             Database.Instance.InsertCollection(this.GenerateAmountsCollection(), Database.CollectionNames.Counts);
             Database.Instance.InsertCollection(this.GenerateTransactionsCollection(), Database.CollectionNames.Transactions);
+            Database.Instance.InsertCollection(this.GenerateRatingsCollection(), Database.CollectionNames.Ratings);
+        }
+
+        internal void Export(object state)
+        {
+            Export();
         }
     }
 }

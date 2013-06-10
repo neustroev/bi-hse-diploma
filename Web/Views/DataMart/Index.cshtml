@@ -6,8 +6,7 @@
         <div class="span3">
             <div id="navPanel" class="well sidebar-nav">
                 <ul class="nav nav-list">
-                    <li class="active"><a href="#main">Основные показатели</a></li>
-                    <li class=""><a href="#counts">Количественные показатели</a></li>
+                    <li class="active"><a href="#counts">Количественные показатели</a></li>
                     <li class=""><a href="#aggr">Агрегированные показатели</a></li>
                     <li class=""><a href="#trans">Показатели транзакций</a></li>
                     <li class=""><a href="#rating">Рейтинги</a></li>
@@ -15,19 +14,8 @@
             </div>
         </div>
         <div class="span9">
-            <div id="main" class="viewContainer active" data-action="Index">
-                <div class="controlView">
-                    <div class="btn-group" data-toggle="buttons-radio">
-                        <button type="button" data-target=".tableView" class="btn btn-primary tableViewControl">Таблица</button>
-                        <button type="button" data-target=".chartView" class="btn btn-primary chartViewControl active">График</button>
-                    </div>
-                </div>
-                <div class="contentView">
-                    <div class="chartView active"></div>
-                    <div class="tableView">Здесь будет таблица с данными</div>
-                </div>
-            </div>
-            <div id="counts" class="viewContainer" data-action="GetAmounts">
+            <div id="counts" class="viewContainer active" data-action="GetAmounts">
+                <h1 class="text-center">Количественные показатели</h1>
                 <div class="controlView">
                     <div class="btn-group" data-toggle="buttons-radio">
                         <button type="button" data-target=".tableView" class="btn btn-primary tableViewControl">Таблица</button>
@@ -40,6 +28,7 @@
                 </div>
             </div>
             <div id="aggr" class="viewContainer" data-action="GetAggregations">
+                <h1 class="text-center">Агрегированные показатели</h1>
                 <div class="controlView">
                     <div class="btn-group" data-toggle="buttons-radio">
                         <button type="button" data-target=".tableView" class="btn btn-primary tableViewControl">Таблица</button>
@@ -52,6 +41,7 @@
                 </div>
             </div>
             <div id="trans" class="viewContainer" data-action="GetTransactions">
+                <h1 class="text-center">Показатели транзакций</h1>
                 <div class="controlView">
                     <div class="btn-group" data-toggle="buttons-radio">
                         <button type="button" data-target=".tableView" class="btn btn-primary tableViewControl">Таблица</button>
@@ -59,11 +49,12 @@
                     </div>
                 </div>
                 <div class="contentView">
-                    <div class="chartView active" ></div>
+                    <div class="chartView active"></div>
                     <div class="tableView"></div>
                 </div>
             </div>
-            <div id="rating" class="viewContainer" data-action="Index">
+            <div id="rating" class="viewContainer" data-action="GetRatings">
+                <h1 class="text-center">Рейтинги</h1>
                 <div class="controlView">
                     <div class="btn-group" data-toggle="buttons-radio">
                         <button type="button" data-target=".tableView" class="btn btn-primary tableViewControl">Таблица</button>
@@ -78,6 +69,13 @@
         </div>
     </div>
 </div>
+<div id="loader">
+    <div class="progress progress-striped active">
+        <div class="bar" style="width: 100%;"></div>
+    </div>
+    <div id="loader-wrapper">
+    </div>
+</div>
 <!-- TO DO: move scripts into bundle -->
 <script src="http://code.highcharts.com/highcharts.js"></script>
 <script src="http://code.highcharts.com/modules/exporting.js"></script>
@@ -86,7 +84,7 @@
 <script type="text/javascript" src="http://www.highcharts.com/highslide/highslide-full.min.js"></script>
 <script type="text/javascript" src="http://www.highcharts.com/highslide/highslide.config.js" charset="utf-8"></script>
 <link rel="stylesheet" type="text/css" href="http://www.highcharts.com/highslide/highslide.css" />
-@*<script src="http://www.datatables.net/download/build/jquery.dataTables.js"></script>*@
+<script src="~/Scripts/datamart-application/chart.config.js"></script>
 @Scripts.Render("~/bundles/scripts/datamart")
 
 <script>
@@ -94,7 +92,9 @@
         var dmPage = new DataMart({
             navigationPanel: $('#navPanel'),
             viewContainers: $('.viewContainer'),
-            viewControls: $('.tableViewControl, .chartViewControl')            
+            viewControls: $('.tableViewControl, .chartViewControl'),
+            updateControl: $('#dataUpdate'),
+            loader: $('#loader')
         });
     });
 </script>

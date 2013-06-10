@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -22,6 +23,8 @@ namespace Web
 			FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
 			RouteConfig.RegisterRoutes(RouteTable.Routes);
 			BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            Timer exportTimer = new Timer(Web.Code.DataExportProvider.DataExportProvider.Instance.Export, null, 0, 86400000);
 		}
 	}
 }
