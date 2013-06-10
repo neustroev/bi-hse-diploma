@@ -49,6 +49,7 @@ namespace APIServer.Controllers
 					id = item.Id,
 					name = item.Name,
 					author = item.UserId,
+					author_name = item.User.Name,
 					category = item.Category_Id,
 					genre = item.PublicationGenre.Select(x => x.Genre_Id).ToList(),
 					genre_name = item.PublicationGenre.Select(x => x.Genre.Name).ToList(),
@@ -109,7 +110,7 @@ namespace APIServer.Controllers
 				}
 				return new
 				{
-					succss = true
+					success = true
 				};
 			}
 			catch (Exception ex)

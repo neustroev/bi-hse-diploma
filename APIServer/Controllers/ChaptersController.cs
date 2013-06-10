@@ -17,15 +17,20 @@ namespace APIServer.Controllers
 	{
 		private BookStoreEntities _db = new BookStoreEntities();
 
-		public object Get(int publication, int? id = null)
+		[TokenAuth]
+		public object Get(int publication, string access_token, int? id = null)
 		{
+			int user_id = Convert.ToInt32(access_token.Split('-')[0]);
 			if (id == null)
 			{
 				return _db.Chapter.Where(o => o.Publication_Id == publication).Select(o => new
 				{
 					id = o.Id,
 					name = o.Name,
-					price = o.Price
+					price = o.Price,
+					author_name = o.Publication.User.Name,
+					author = o.Publication.UserId,
+					has = o.Transaction.Any(x=>x.UserId == user_id)
 				}).ToList();
 			}
 			else
@@ -38,6 +43,9 @@ namespace APIServer.Controllers
 					id = p.Id,
 					name = p.Name,
 					price = p.Price,
+					author_name = p.Publication.User.Name,
+					author = p.Publication.UserId,
+					has = p.Transaction.Any(x=>x.UserId == user_id),
 					content = Encoding.UTF8.GetString(p.Content)
 				};
 			}
@@ -46,9 +54,9 @@ namespace APIServer.Controllers
 		[TokenAuth]
 		public object Post(string access_token, [FromBody]ChPost data)
 		{
-			int user_id = Convert.ToInt32(access_token.Split('-')[0]);
 			try
 			{
+				int user_id = Convert.ToInt32(access_token.Split('-')[0]);
 				if (string.IsNullOrWhiteSpace(data.name) || data.publication_id == 0 || string.IsNullOrWhiteSpace(data.content))
 					throw new HttpResponseException(Request.GenerateCustomError(ErrorEnum.InvalidQueryParameterValue));
 				var chapter = new Chapter()
