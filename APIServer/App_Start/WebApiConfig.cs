@@ -28,6 +28,12 @@ namespace APIServer
 				defaults: new { controller = "publication", action = "GenreRating" }
 			);
 
+			config.Routes.MapHttpRoute(
+				name: "edit_chapter",
+				routeTemplate: "chapters/edit",
+				defaults: new { controller = "chapters", action = "edit" }
+			);
+
 			config.Routes.MapHttpRoute("DefaultApiGet",
 				"{controller}",
 				new { action = "Get" },
@@ -38,7 +44,12 @@ namespace APIServer
 				new { action = "Post" },
 				new { method = new System.Web.Http.Routing.HttpMethodConstraint(HttpMethod.Post, HttpMethod.Options) });
 
-			
+			config.Routes.MapHttpRoute("DefaultApiDelete",
+				"{controller}",
+				new { action = "Delete" },
+				new { method = new System.Web.Http.Routing.HttpMethodConstraint(HttpMethod.Delete, HttpMethod.Options) });
+
+
 			// Uncomment the following line of code to enable query support for actions with an IQueryable or IQueryable<T> return type.
 			// To avoid processing unexpected or malicious queries, use the validation settings on QueryableAttribute to validate incoming queries.
 			// For more information, visit http://go.microsoft.com/fwlink/?LinkId=279712.

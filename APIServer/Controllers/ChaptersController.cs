@@ -30,7 +30,7 @@ namespace APIServer.Controllers
 					price = o.Price,
 					author_name = o.Publication.User.Name,
 					author = o.Publication.UserId,
-					has = o.Transaction.Any(x=>x.UserId == user_id)
+					has = o.Transaction.Any(x => x.UserId == user_id)
 				}).ToList();
 			}
 			else
@@ -45,8 +45,8 @@ namespace APIServer.Controllers
 					price = p.Price,
 					author_name = p.Publication.User.Name,
 					author = p.Publication.UserId,
-					has = p.Transaction.Any(x=>x.UserId == user_id),
-					content = Encoding.UTF8.GetString(p.Content)
+					has = p.Transaction.Any(x => x.UserId == user_id),
+					content = p.Content == null ? "" : Encoding.UTF8.GetString(p.Content)
 				};
 			}
 		}
@@ -57,21 +57,83 @@ namespace APIServer.Controllers
 			try
 			{
 				int user_id = Convert.ToInt32(access_token.Split('-')[0]);
-				if (string.IsNullOrWhiteSpace(data.name) || data.publication_id == 0 || string.IsNullOrWhiteSpace(data.content))
+				if (string.IsNullOrWhiteSpace(data.name) || data.publication_id == 0)
 					throw new HttpResponseException(Request.GenerateCustomError(ErrorEnum.InvalidQueryParameterValue));
 				var chapter = new Chapter()
 				{
 					Name = data.name,
 					Publication_Id = data.publication_id,
-					Price = data.price,
-					Content = Encoding.UTF8.GetBytes(data.content)
+					Price = data.price
 				};
 				_db.Chapter.Add(chapter);
 				_db.SaveChanges();
 				return new
 				{
-					succss = true
+					success = true
 				};
+			}
+			catch (Exception ex)
+			{
+				return new
+				{
+					success = false,
+					error = ex.Message
+				};
+
+			}
+		}
+
+		[TokenAuth]
+		[HttpPost]
+		public object Edit(string access_token, [FromBody]ChPost data)
+		{
+			try
+			{
+				int user_id = Convert.ToInt32(access_token.Split('-')[0]);
+				if (data.id == 0 || string.IsNullOrWhiteSpace(data.content))
+					throw new HttpResponseException(Request.GenerateCustomError(ErrorEnum.InvalidQueryParameterValue));
+				var chapter = _db.Chapter.FirstOrDefault(o => o.Id == data.id);
+				if (chapter.Publication.UserId != user_id)
+					throw new HttpResponseException(Request.GenerateCustomError(ErrorEnum.InvalidAuthenticationInfo));
+				else
+				{
+					chapter.Content = Encoding.UTF8.GetBytes(data.content);
+					_db.SaveChanges();
+					return new
+					{
+						success = true
+					};
+				}
+			}
+			catch (Exception ex)
+			{
+				return new
+				{
+					success = false,
+					error = ex.Message
+				};
+
+			}
+		}
+
+		[TokenAuth]
+		public object Delete(string access_token, int id)
+		{
+			try
+			{
+				int user_id = Convert.ToInt32(access_token.Split('-')[0]);
+				var chapter = _db.Chapter.FirstOrDefault(o => o.Id == id);
+				if (chapter.Publication.UserId != user_id)
+					throw new HttpResponseException(Request.GenerateCustomError(ErrorEnum.InvalidAuthenticationInfo));
+				else
+				{
+					//_db.Chapter.Remove(chapter);
+					_db.SaveChanges();
+					return new
+					{
+						succss = true
+					};
+				}
 			}
 			catch (Exception ex)
 			{
@@ -86,6 +148,7 @@ namespace APIServer.Controllers
 
 		public class ChPost
 		{
+			public int id { get; set; }
 			public string name { get; set; }
 			public int publication_id { get; set; }
 			public string content { get; set; }

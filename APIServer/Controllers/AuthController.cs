@@ -91,7 +91,7 @@ namespace APIServer.Controllers
 
 		}
 
-		public string GenerateSalt()
+		private string GenerateSalt()
 		{
 			string str = "";
 			Random rand = new Random();
@@ -102,7 +102,7 @@ namespace APIServer.Controllers
 			return str;
 		}
 
-		public string GetMd5Hash(string input)
+		private string GetMd5Hash(string input)
 		{
 			byte[] data = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(input));
 			StringBuilder sBuilder = new StringBuilder();

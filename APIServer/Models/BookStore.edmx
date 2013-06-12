@@ -8,6 +8,8 @@
         <EntityContainer Name="BookStoreModelStoreContainer">
           <EntitySet Name="Category" EntityType="BookStoreModel.Store.Category" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="Chapter" EntityType="BookStoreModel.Store.Chapter" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="City" EntityType="BookStoreModel.Store.City" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Country" EntityType="BookStoreModel.Store.Country" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="Genre" EntityType="BookStoreModel.Store.Genre" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="Publication" EntityType="BookStoreModel.Store.Publication" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="PublicationGenre" EntityType="BookStoreModel.Store.PublicationGenre" store:Type="Tables" Schema="dbo" />
@@ -16,6 +18,10 @@
           <AssociationSet Name="FK_ChapterPublication" Association="BookStoreModel.Store.FK_ChapterPublication">
             <End Role="Publication" EntitySet="Publication" />
             <End Role="Chapter" EntitySet="Chapter" />
+          </AssociationSet>
+          <AssociationSet Name="FK_City_0" Association="BookStoreModel.Store.FK_City_0">
+            <End Role="Country" EntitySet="Country" />
+            <End Role="City" EntitySet="City" />
           </AssociationSet>
           <AssociationSet Name="FK_GenreGenre" Association="BookStoreModel.Store.FK_GenreGenre">
             <End Role="Genre" EntitySet="Genre" />
@@ -36,6 +42,10 @@
           <AssociationSet Name="FK_TransactionChapter" Association="BookStoreModel.Store.FK_TransactionChapter">
             <End Role="Chapter" EntitySet="Chapter" />
             <End Role="Transaction" EntitySet="Transaction" />
+          </AssociationSet>
+          <AssociationSet Name="FK_User_0" Association="BookStoreModel.Store.FK_User_0">
+            <End Role="City" EntitySet="City" />
+            <End Role="User" EntitySet="User" />
           </AssociationSet>
           <AssociationSet Name="FK_UserPublication" Association="BookStoreModel.Store.FK_UserPublication">
             <End Role="User" EntitySet="User" />
@@ -62,6 +72,21 @@
           <Property Name="Content" Type="varbinary(max)" />
           <Property Name="Price" Type="float" Nullable="false" />
           <Property Name="Publication_Id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="City">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="bigint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Country_id" Type="bigint" />
+        </EntityType>
+        <EntityType Name="Country">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="bigint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
         </EntityType>
         <EntityType Name="Genre">
           <Key>
@@ -111,6 +136,7 @@
           <Property Name="Birthdate" Type="datetime" Nullable="false" />
           <Property Name="Balance" Type="float" Nullable="false" />
           <Property Name="Salt" Type="nvarchar(max)" />
+          <Property Name="City" Type="bigint" />
         </EntityType>
         <Association Name="FK_ChapterPublication">
           <End Role="Publication" Type="BookStoreModel.Store.Publication" Multiplicity="1" />
@@ -121,6 +147,18 @@
             </Principal>
             <Dependent Role="Chapter">
               <PropertyRef Name="Publication_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_City_0">
+          <End Role="Country" Type="BookStoreModel.Store.Country" Multiplicity="0..1" />
+          <End Role="City" Type="BookStoreModel.Store.City" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Country">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="City">
+              <PropertyRef Name="Country_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -181,6 +219,18 @@
             </Principal>
             <Dependent Role="Transaction">
               <PropertyRef Name="Chapter_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_User_0">
+          <End Role="City" Type="BookStoreModel.Store.City" Multiplicity="0..1" />
+          <End Role="User" Type="BookStoreModel.Store.User" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="City">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="User">
+              <PropertyRef Name="City" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -251,6 +301,16 @@
           <AssociationSet Name="FK_UserTransaction" Association="BookStoreModel.FK_UserTransaction">
             <End Role="User" EntitySet="User" />
             <End Role="Transaction" EntitySet="Transaction" />
+          </AssociationSet>
+          <EntitySet Name="City" EntityType="BookStoreModel.City" />
+          <EntitySet Name="Country" EntityType="BookStoreModel.Country" />
+          <AssociationSet Name="FK_City_0" Association="BookStoreModel.FK_City_0">
+            <End Role="Country" EntitySet="Country" />
+            <End Role="City" EntitySet="City" />
+          </AssociationSet>
+          <AssociationSet Name="FK_User_0" Association="BookStoreModel.FK_User_0">
+            <End Role="City" EntitySet="City" />
+            <End Role="User" EntitySet="User" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="Category">
@@ -334,6 +394,8 @@
           <Property Name="Salt" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
           <NavigationProperty Name="Publication" Relationship="BookStoreModel.FK_UserPublication" FromRole="User" ToRole="Publication" />
           <NavigationProperty Name="Transaction" Relationship="BookStoreModel.FK_UserTransaction" FromRole="User" ToRole="Transaction" />
+          <Property Type="Int64" Name="City" />
+          <NavigationProperty Name="City1" Relationship="BookStoreModel.FK_User_0" FromRole="User" ToRole="City" />
         </EntityType>
         <Association Name="FK_PublicationCategory">
           <End Role="Category" Type="BookStoreModel.Category" Multiplicity="1" />
@@ -431,6 +493,48 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="City">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int64" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Type="Int64" Name="Country_id" />
+          <NavigationProperty Name="Country" Relationship="BookStoreModel.FK_City_0" FromRole="City" ToRole="Country" />
+          <NavigationProperty Name="User" Relationship="BookStoreModel.FK_User_0" FromRole="City" ToRole="User" />
+        </EntityType>
+        <EntityType Name="Country">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int64" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="City" Relationship="BookStoreModel.FK_City_0" FromRole="Country" ToRole="City" />
+        </EntityType>
+        <Association Name="FK_City_0">
+          <End Type="BookStoreModel.Country" Role="Country" Multiplicity="0..1" />
+          <End Type="BookStoreModel.City" Role="City" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Country">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="City">
+              <PropertyRef Name="Country_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_User_0">
+          <End Type="BookStoreModel.City" Role="City" Multiplicity="0..1" />
+          <End Type="BookStoreModel.User" Role="User" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="City">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="User">
+              <PropertyRef Name="City" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -499,6 +603,7 @@
           <EntitySetMapping Name="User">
             <EntityTypeMapping TypeName="BookStoreModel.User">
               <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="City" ColumnName="City" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Password" ColumnName="Password" />
                 <ScalarProperty Name="Login" ColumnName="Login" />
@@ -507,6 +612,23 @@
                 <ScalarProperty Name="Birthdate" ColumnName="Birthdate" />
                 <ScalarProperty Name="Balance" ColumnName="Balance" />
                 <ScalarProperty Name="Salt" ColumnName="Salt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="City">
+            <EntityTypeMapping TypeName="BookStoreModel.City">
+              <MappingFragment StoreEntitySet="City">
+                <ScalarProperty Name="Country_id" ColumnName="Country_id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Country">
+            <EntityTypeMapping TypeName="BookStoreModel.Country">
+              <MappingFragment StoreEntitySet="Country">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

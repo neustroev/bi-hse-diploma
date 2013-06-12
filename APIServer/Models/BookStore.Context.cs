@@ -32,5 +32,7 @@ namespace APIServer.Models
         public DbSet<PublicationGenre> PublicationGenre { get; set; }
         public DbSet<Transaction> Transaction { get; set; }
         public DbSet<User> User { get; set; }
+        public DbSet<City> City { get; set; }
+        public DbSet<Country> Country { get; set; }
     }
 }
